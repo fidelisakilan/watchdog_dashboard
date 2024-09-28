@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
 import 'package:watchdog_dashboard/config.dart';
-import 'package:watchdog_dashboard/modules/home/bloc/timeline_bloc.dart';
+import 'package:watchdog_dashboard/modules/home/bloc/camera_bloc.dart';
+import 'package:watchdog_dashboard/modules/home/ui/video_preview_screen.dart';
 import 'package:watchdog_dashboard/tiles/dynamic_timeline_tile_flutter.dart';
-import 'package:watchdog_dashboard/widgets/loadingwidget.dart';
-
+import 'package:watchdog_dashboard/widgets/loading_widget.dart';
 import '../../../widgets/divider.dart';
 
 class TimelineWidget extends StatelessWidget {
@@ -34,7 +34,7 @@ class TimelinePromptWidget extends StatefulWidget {
 }
 
 class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
-  final TimelineBloc bloc = TimelineBloc();
+  final CameraBloc bloc = CameraBloc.instance;
 
   @override
   void initState() {
@@ -58,23 +58,30 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<DateTranscriptionModel>>(
+    return StreamBuilder<CameraModel>(
       stream: bloc.stream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Loadingwidget();
+          return const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LoadingWidget(),
+            ],
+          );
         }
 
         return LayoutBuilder(builder: (context, constraints) {
+          int cIndex = snapshot.data!.index;
           return Padding(
             padding: EdgeInsets.only(right: constraints.maxWidth * 0.25),
             child: SingleChildScrollView(
               child: MultiDynamicTimelineTileBuilder(
-                itemCount: snapshot.data!.length,
+                itemCount: snapshot.data!.cameras[cIndex].length,
                 itemBuilder: (context, index) {
-                  final model = snapshot.data![index];
+                  final model = snapshot.data!.cameras[cIndex][index];
                   return MultiDynamicTimelineTile(
                     crossSpacing: 15,
+                    mainSpacing: 8,
                     indicatorRadius: 6,
                     indicatorWidth: 1,
                     starerChild: [
@@ -90,10 +97,13 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
                     eventsList: [
                       model.chats.map((chat) {
                         return EventCard(
-                          cardColor: Colors.grey,
+                          cardColor: chat.flagged
+                              ? context.colorScheme.errorContainer
+                              : context.colorScheme.surfaceContainer,
                           child: CustomEventTile2(
                             title: parseTime(chat.timeStamp),
                             description: chat.content,
+                            videoUrl: chat.videoUrl,
                           ),
                         );
                       }).toList()
@@ -133,23 +143,53 @@ class TranscriptionModel {
 class CustomEventTile2 extends StatelessWidget {
   final String title;
   final String description;
+  final String? videoUrl;
 
   const CustomEventTile2({
     super.key,
     required this.title,
     required this.description,
+    this.videoUrl,
   });
+
+  void onTap(BuildContext context, String videoUrl) {
+    context.push(VideoPreviewScreen(url: videoUrl));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text(title, style: context.textTheme.labelMedium),
-        Text(
-          description,
-          style: context.textTheme.bodyLarge,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: context.textTheme.labelMedium),
+              Text(
+                description,
+                style: context.textTheme.bodyLarge,
+              ),
+            ],
+          ),
         ),
+        if (videoUrl != null)
+          GestureDetector(
+            onTap: () {
+              onTap(context, videoUrl!);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.black,
+              ),
+              width: 50,
+              height: 50,
+              child: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+              ),
+            ),
+          ),
       ],
     );
   }
