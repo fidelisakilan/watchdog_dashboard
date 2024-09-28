@@ -13,9 +13,32 @@ class CameraBloc {
 
   Stream<CameraModel> get stream => _subject.stream;
 
+  final BehaviorSubject<List<AlertChatModel>> _alertSubject =
+      BehaviorSubject<List<AlertChatModel>>();
+
+  Stream<List<AlertChatModel>> get alertStream => _alertSubject.stream;
+
   CameraModel cameraModel = CameraModel(cameras: cameras, index: 0);
 
   void loadData() {
+    _subject.sink.add(cameraModel);
+
+    final List<AlertChatModel> alerts = [];
+    for (var element in cameraModel.cameras) {
+      for (var element1 in element) {
+        for (var element2 in element1.chats) {
+          if (element2.flagged) {
+            alerts.add(AlertChatModel(
+              chatModel: element2,
+              index: (element == cameraModel.cameras[0]) ? 0 : 1,
+              chatIndex: element.indexOf(element1),
+            ));
+          }
+        }
+      }
+    }
+    _alertSubject.add(alerts);
+
     _subject.sink.add(cameraModel);
   }
 
@@ -24,8 +47,21 @@ class CameraBloc {
   }
 
   void dispose() {
+    _alertSubject.close();
     _subject.close();
   }
+}
+
+class AlertChatModel {
+  final TranscriptionModel chatModel;
+  final int index;
+  final int chatIndex;
+
+  AlertChatModel({
+    required this.chatModel,
+    required this.index,
+    required this.chatIndex,
+  });
 }
 
 class CameraModel {

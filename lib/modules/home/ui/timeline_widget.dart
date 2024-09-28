@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/modules/home/bloc/camera_bloc.dart';
@@ -16,6 +17,16 @@ class TimelineWidget extends StatelessWidget {
         AppBar(
           title: const Text('Timeline'),
           centerTitle: false,
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.logout,
+                color: context.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
         ),
         const DividerWidget(),
         const Expanded(
@@ -97,6 +108,7 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
                     eventsList: [
                       model.chats.map((chat) {
                         return EventCard(
+                          cardRadius: BorderRadius.circular(20),
                           cardColor: chat.flagged
                               ? context.colorScheme.errorContainer
                               : context.colorScheme.surfaceContainer,
@@ -130,6 +142,7 @@ class TranscriptionModel {
   final String content;
   final DateTime timeStamp;
   final String? videoUrl;
+  final int? videoOffset;
   final bool flagged;
 
   TranscriptionModel({
@@ -137,6 +150,7 @@ class TranscriptionModel {
     required this.timeStamp,
     this.flagged = false,
     this.videoUrl,
+    this.videoOffset,
   });
 }
 
@@ -165,9 +179,16 @@ class CustomEventTile2 extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: context.textTheme.labelMedium),
-              Text(
-                description,
-                style: context.textTheme.bodyLarge,
+              GestureDetector(
+                onTap: () {
+                  const snackBar = SnackBar(content: Text('Copied Text'));
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  Clipboard.setData(ClipboardData(text: description));
+                },
+                child: Text(
+                  description,
+                  style: context.textTheme.bodyLarge,
+                ),
               ),
             ],
           ),
@@ -179,7 +200,7 @@ class CustomEventTile2 extends StatelessWidget {
             },
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(32),
                 color: Colors.black,
               ),
               width: 50,
