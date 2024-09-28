@@ -3,9 +3,11 @@ import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/widgets/loading_widget.dart';
 
 class VideoPreviewScreen extends StatefulWidget {
-  const VideoPreviewScreen({super.key, required this.url});
+  const VideoPreviewScreen(
+      {super.key, required this.url, required this.eventTime});
 
   final String url;
+  final int? eventTime;
 
   @override
   State<VideoPreviewScreen> createState() => _VideoPreviewScreenState();
@@ -23,6 +25,8 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
       : _controller.value.position.inMilliseconds /
           _controller.value.duration.inMilliseconds;
 
+  bool showSkip = true;
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +39,16 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
     _controller.setLooping(false);
     _controller.play();
     if (mounted) setState(() {});
+    _controller.addListener(
+      () {
+        if (widget.eventTime == null) return;
+        bool isLesser =
+            _controller.value.position.inSeconds < widget.eventTime!;
+        if (isLesser != showSkip) {
+          if (mounted) setState(() => showSkip = isLesser);
+        }
+      },
+    );
   }
 
   @override
@@ -96,6 +110,41 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                             ),
                           ),
                           const Spacer(),
+                          Visibility(
+                            visible: widget.eventTime != 0,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (widget.eventTime != null && showSkip) {
+                                      _controller.seekTo(
+                                          Duration(seconds: widget.eventTime!));
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: showSkip
+                                          ? context.colorScheme.onSurface
+                                              .withOpacity(0.8)
+                                          : Colors.green.withOpacity(0.8),
+                                    ),
+                                    padding: const EdgeInsets.all(10),
+                                    child: Text(
+                                      showSkip
+                                          ? 'Skip to Event'
+                                          : 'Showing Event',
+                                      style:
+                                          context.textTheme.bodySmall!.copyWith(
+                                        color: context.colorScheme.surface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                           Align(
                             alignment: Alignment.bottomCenter,
                             child: Padding(

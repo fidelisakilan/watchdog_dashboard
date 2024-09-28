@@ -145,6 +145,7 @@ class AlertWindowWidget extends StatelessWidget {
                             ? context.colorScheme.errorContainer
                             : context.colorScheme.surfaceContainer,
                         child: CustomEventTile(
+                          eventTime: chat.chatModel.videoOffset,
                           title:
                               'Camera ${chat.index + 1}: ${parseTime(chat.chatModel.timeStamp)}',
                           description: chat.chatModel.content,

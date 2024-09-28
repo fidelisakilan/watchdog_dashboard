@@ -73,56 +73,54 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
             ],
           );
         }
-
-        return LayoutBuilder(builder: (context, constraints) {
-          int cIndex = snapshot.data!.index;
-          return Padding(
-            padding: EdgeInsets.only(right: constraints.maxWidth * 0.25),
-            child: SingleChildScrollView(
-              child: MultiDynamicTimelineTileBuilder(
-                itemCount: snapshot.data!.cameras[cIndex].length,
-                itemBuilder: (context, index) {
-                  final chats =
-                      snapshot.data!.cameras[cIndex].values.elementAt(index);
-                  final date =
-                      snapshot.data!.cameras[cIndex].keys.elementAt(index);
-                  return MultiDynamicTimelineTile(
-                    itemCount: chats.length,
-                    crossSpacing: 15,
-                    mainSpacing: 8,
-                    indicatorRadius: 6,
-                    indicatorWidth: 1,
-                    starerChild: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
-                        child: Text(
-                          date,
-                          style: context.textTheme.labelSmall,
+        int cIndex = snapshot.data!.index;
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: MultiDynamicTimelineTileBuilder(
+              itemCount: snapshot.data!.cameras[cIndex].length,
+              itemBuilder: (context, index) {
+                final chats =
+                    snapshot.data!.cameras[cIndex].values.elementAt(index);
+                final date =
+                    snapshot.data!.cameras[cIndex].keys.elementAt(index);
+                return MultiDynamicTimelineTile(
+                  itemCount: chats.length,
+                  crossSpacing: 15,
+                  mainSpacing: 8,
+                  indicatorRadius: 6,
+                  indicatorWidth: 1,
+                  starerChild: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      child: Text(
+                        date,
+                        style: context.textTheme.labelSmall,
+                      ),
+                    )
+                  ],
+                  eventsList: [
+                    chats.map((chat) {
+                      return EventCard(
+                        cardRadius: BorderRadius.circular(20),
+                        cardColor: chat.flagged
+                            ? context.colorScheme.errorContainer
+                            : context.colorScheme.surfaceContainer,
+                        child: CustomEventTile(
+                          title: DateFormatUtils.parseTime(chat.timeStamp),
+                          description: chat.content,
+                          videoUrl: chat.videoUrl,
+                          eventTime: chat.videoOffset,
                         ),
-                      )
-                    ],
-                    eventsList: [
-                      chats.map((chat) {
-                        return EventCard(
-                          cardRadius: BorderRadius.circular(20),
-                          cardColor: chat.flagged
-                              ? context.colorScheme.errorContainer
-                              : context.colorScheme.surfaceContainer,
-                          child: CustomEventTile(
-                            title: DateFormatUtils.parseTime(chat.timeStamp),
-                            description: chat.content,
-                            videoUrl: chat.videoUrl,
-                          ),
-                        );
-                      }).toList()
-                    ],
-                  );
-                },
-              ),
+                      );
+                    }).toList()
+                  ],
+                );
+              },
             ),
-          );
-        });
+          ),
+        );
       },
     );
   }
@@ -139,16 +137,21 @@ class CustomEventTile extends StatelessWidget {
   final String title;
   final String description;
   final String? videoUrl;
+  final int? eventTime;
 
   const CustomEventTile({
     super.key,
     required this.title,
     required this.description,
     this.videoUrl,
+    required this.eventTime,
   });
 
-  void onTap(BuildContext context, String videoUrl) {
-    context.push(VideoPreviewScreen(url: videoUrl));
+  void onTap(BuildContext context, String videoUrl, int? eventTime) {
+    context.push(VideoPreviewScreen(
+      url: videoUrl,
+      eventTime: eventTime,
+    ));
   }
 
   @override
@@ -177,7 +180,7 @@ class CustomEventTile extends StatelessWidget {
         if (videoUrl != null)
           GestureDetector(
             onTap: () {
-              onTap(context, videoUrl!);
+              onTap(context, videoUrl!, eventTime);
             },
             child: Container(
               decoration: BoxDecoration(

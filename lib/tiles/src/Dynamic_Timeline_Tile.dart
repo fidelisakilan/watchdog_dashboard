@@ -485,6 +485,9 @@ class MultiDynamicTimelineTile extends StatelessWidget {
                   ],
                 ),
               ),
+              SizedBox(
+                width: crossSpacing ?? 16,
+              ),
             ],
           ),
         );
