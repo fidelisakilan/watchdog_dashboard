@@ -147,64 +147,84 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
                           ),
                           Align(
                             alignment: Alignment.bottomCenter,
-                            child: Padding(
-                              padding: const EdgeInsets.all(15),
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (_controller.value.isPlaying) {
-                                        _controller.pause();
-                                      } else {
-                                        if (seekerPosition == 1) {
-                                          _controller.seekTo(Duration.zero);
-                                        }
-                                        _controller.play();
-                                      }
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      padding: const EdgeInsets.all(8),
-                                      child: Icon(
-                                        _controller.value.isPlaying
-                                            ? Icons.pause_outlined
-                                            : Icons.play_arrow,
-                                        color: Colors.white,
-                                        size: 32,
-                                      ),
-                                    ),
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(30),
+                                bottomRight: Radius.circular(30),
+                              ),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black54,
+                                    ],
                                   ),
-                                  Expanded(
-                                    child: SliderTheme(
-                                      data: SliderTheme.of(context).copyWith(
-                                        thumbShape:
-                                            SliderComponentShape.noThumb,
-                                        inactiveTrackColor: context
-                                            .colorScheme.surface
-                                            .withOpacity(0.25),
-                                        activeTrackColor:
-                                            context.colorScheme.primary,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15),
+                                  child: Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (_controller.value.isPlaying) {
+                                            _controller.pause();
+                                          } else {
+                                            if (seekerPosition == 1) {
+                                              _controller.seekTo(Duration.zero);
+                                            }
+                                            _controller.play();
+                                          }
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          padding: const EdgeInsets.all(8),
+                                          child: Icon(
+                                            _controller.value.isPlaying
+                                                ? Icons.pause_outlined
+                                                : Icons.play_arrow,
+                                            color: Colors.white,
+                                            size: 32,
+                                          ),
+                                        ),
                                       ),
-                                      child: Slider(
-                                        onChanged: ((value) {
-                                          _controller.seekTo(
-                                              _controller.value.duration *
-                                                  value);
-                                        }),
-                                        min: 0,
-                                        max: 1,
-                                        value: seekerPosition,
+                                      Expanded(
+                                        child: SliderTheme(
+                                          data:
+                                              SliderTheme.of(context).copyWith(
+                                            thumbShape:
+                                                SliderComponentShape.noThumb,
+                                            inactiveTrackColor: context
+                                                .colorScheme.surface
+                                                .withOpacity(0.25),
+                                            activeTrackColor:
+                                                context.colorScheme.primary,
+                                          ),
+                                          child: Slider(
+                                            onChanged: ((value) {
+                                              _controller.seekTo(
+                                                  _controller.value.duration *
+                                                      value);
+                                            }),
+                                            min: 0,
+                                            max: 1,
+                                            value: seekerPosition,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      Text(
+                                        '${_controller.value.position.inSeconds} ss',
+                                        style: context.textTheme.bodySmall!
+                                            .copyWith(color: Colors.white),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    '${_controller.value.position.inSeconds} ss',
-                                    style: context.textTheme.bodySmall!
-                                        .copyWith(color: Colors.white),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),

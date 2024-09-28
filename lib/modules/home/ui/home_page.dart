@@ -115,7 +115,7 @@ class AlertWindowWidget extends StatelessWidget {
       child: Column(
         children: [
           AppBar(
-            title: const Text('All Alerts'),
+            title: const Text('All Alerts 🚩'),
             actions: const [SizedBox()],
           ),
           Expanded(

@@ -1,8 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/firebase_options.dart';
 import 'package:watchdog_dashboard/modules/home/ui/home_page.dart';
+import 'package:watchdog_dashboard/theme.dart';
+import 'package:watchdog_dashboard/util.dart';
 
 void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -14,15 +17,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextTheme textTheme =
+        createTextTheme(context, "Inter Tight", "Chau Philomene One");
+
+    MaterialTheme theme = MaterialTheme(textTheme);
     return MaterialApp(
       title: 'WatchDog Dashboard',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          color: Colors.transparent,
-          centerTitle: false,
+      theme: theme.light().copyWith(
+            appBarTheme: const AppBarTheme(
+              color: Colors.transparent,
+              centerTitle: false,
+            ),
+          ),
+      scrollBehavior: ScrollConfiguration.of(context).copyWith(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
         ),
       ),
       home: const HomePage(),

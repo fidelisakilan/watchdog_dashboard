@@ -1,4 +1,4 @@
-import 'package:flutter/services.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/modules/home/bloc/camera_bloc.dart';
 import 'package:watchdog_dashboard/modules/home/ui/video_preview_screen.dart';
@@ -51,7 +51,9 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
   @override
   void initState() {
     super.initState();
-    bloc.loadData();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      bloc.loadData();
+    });
   }
 
   @override
@@ -96,7 +98,9 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
                           vertical: 10, horizontal: 10),
                       child: Text(
                         date,
-                        style: context.textTheme.labelSmall,
+                        style: context.textTheme.labelSmall!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     )
                   ],
@@ -162,17 +166,15 @@ class CustomEventTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: context.textTheme.labelMedium),
-              GestureDetector(
-                onTap: () {
-                  const snackBar = SnackBar(content: Text('Copied Text'));
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  Clipboard.setData(ClipboardData(text: description));
-                },
-                child: Text(
-                  description,
-                  style: context.textTheme.bodyLarge,
+              Text(
+                title,
+                style: context.textTheme.labelMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              Text(
+                description,
+                style: context.textTheme.bodyLarge,
               ),
             ],
           ),
@@ -185,13 +187,13 @@ class CustomEventTile extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(32),
-                color: Colors.black,
+                color: context.colorScheme.surface,
               ),
               width: 50,
               height: 50,
-              child: const Icon(
+              child: Icon(
                 Icons.play_arrow,
-                color: Colors.white,
+                color: context.colorScheme.onSurface,
               ),
             ),
           ),
