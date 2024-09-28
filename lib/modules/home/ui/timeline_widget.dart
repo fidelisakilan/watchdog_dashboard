@@ -1,11 +1,12 @@
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/modules/home/bloc/camera_bloc.dart';
 import 'package:watchdog_dashboard/modules/home/ui/video_preview_screen.dart';
 import 'package:watchdog_dashboard/tiles/dynamic_timeline_tile_flutter.dart';
 import 'package:watchdog_dashboard/widgets/loading_widget.dart';
 import '../../../widgets/divider.dart';
+import '../model/camera_model.dart';
+import '../utils.dart';
 
 class TimelineWidget extends StatelessWidget {
   const TimelineWidget({super.key});
@@ -19,7 +20,9 @@ class TimelineWidget extends StatelessWidget {
           centerTitle: false,
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                //TODO:
+              },
               icon: Icon(
                 Icons.logout,
                 color: context.colorScheme.primary,
@@ -29,9 +32,7 @@ class TimelineWidget extends StatelessWidget {
           ],
         ),
         const DividerWidget(),
-        const Expanded(
-          child: TimelinePromptWidget(),
-        ),
+        const Expanded(child: TimelinePromptWidget()),
       ],
     );
   }
@@ -59,14 +60,6 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
     super.dispose();
   }
 
-  String parseDate(DateTime date) {
-    return "${DateFormat.Md().format(date)}\n${date.year}";
-  }
-
-  String parseTime(DateTime time) {
-    return DateFormat.jm().format(time);
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<CameraModel>(
@@ -89,8 +82,12 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
               child: MultiDynamicTimelineTileBuilder(
                 itemCount: snapshot.data!.cameras[cIndex].length,
                 itemBuilder: (context, index) {
-                  final model = snapshot.data!.cameras[cIndex][index];
+                  final chats =
+                      snapshot.data!.cameras[cIndex].values.elementAt(index);
+                  final date =
+                      snapshot.data!.cameras[cIndex].keys.elementAt(index);
                   return MultiDynamicTimelineTile(
+                    itemCount: chats.length,
                     crossSpacing: 15,
                     mainSpacing: 8,
                     indicatorRadius: 6,
@@ -100,20 +97,20 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 10),
                         child: Text(
-                          parseDate(model.date),
+                          date,
                           style: context.textTheme.labelSmall,
                         ),
                       )
                     ],
                     eventsList: [
-                      model.chats.map((chat) {
+                      chats.map((chat) {
                         return EventCard(
                           cardRadius: BorderRadius.circular(20),
                           cardColor: chat.flagged
                               ? context.colorScheme.errorContainer
                               : context.colorScheme.surfaceContainer,
-                          child: CustomEventTile2(
-                            title: parseTime(chat.timeStamp),
+                          child: CustomEventTile(
+                            title: DateFormatUtils.parseTime(chat.timeStamp),
                             description: chat.content,
                             videoUrl: chat.videoUrl,
                           ),
@@ -138,28 +135,12 @@ class DateTranscriptionModel {
   DateTranscriptionModel({required this.date, required this.chats});
 }
 
-class TranscriptionModel {
-  final String content;
-  final DateTime timeStamp;
-  final String? videoUrl;
-  final int? videoOffset;
-  final bool flagged;
-
-  TranscriptionModel({
-    required this.content,
-    required this.timeStamp,
-    this.flagged = false,
-    this.videoUrl,
-    this.videoOffset,
-  });
-}
-
-class CustomEventTile2 extends StatelessWidget {
+class CustomEventTile extends StatelessWidget {
   final String title;
   final String description;
   final String? videoUrl;
 
-  const CustomEventTile2({
+  const CustomEventTile({
     super.key,
     required this.title,
     required this.description,

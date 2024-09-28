@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:watchdog_dashboard/config.dart';
+import 'package:watchdog_dashboard/modules/home/model/camera_model.dart';
 import 'package:watchdog_dashboard/tiles/dynamic_timeline_tile_flutter.dart';
-
 import '../../../widgets/loading_widget.dart';
 import '../bloc/camera_bloc.dart';
 import 'timeline_widget.dart';
@@ -144,7 +144,7 @@ class AlertWindowWidget extends StatelessWidget {
                         cardColor: chat.chatModel.flagged
                             ? context.colorScheme.errorContainer
                             : context.colorScheme.surfaceContainer,
-                        child: CustomEventTile2(
+                        child: CustomEventTile(
                           title:
                               'Camera ${chat.index + 1}: ${parseTime(chat.chatModel.timeStamp)}',
                           description: chat.chatModel.content,

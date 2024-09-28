@@ -46,12 +46,16 @@ class _VideoPreviewScreenState extends State<VideoPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_controller.value.isInitialized) {
-      return const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [LoadingWidget()],
+      return Scaffold(
+        backgroundColor: context.colorScheme.surfaceDim,
+        body: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [LoadingWidget()],
+        ),
       );
     }
     return Scaffold(
+      backgroundColor: context.colorScheme.surfaceDim,
       body: SafeArea(
         child: AnimatedBuilder(
           builder: (context, child) {

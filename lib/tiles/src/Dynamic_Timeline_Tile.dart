@@ -281,7 +281,7 @@ class MultiDynamicTimelineTile extends StatelessWidget {
     this.crossSpacing,
     this.mainSpacing,
     this.dateStyle,
-    this.starerChild, this.indicatorWidth, this.indicatorRadius,
+    this.starerChild, this.indicatorWidth, this.indicatorRadius, required int itemCount,
   })  : assert(
             // making a condition where events length and either the starerchild or starerdates list length should be equal to display the timeline
             (starerChild == null && starerDates != null) ||
