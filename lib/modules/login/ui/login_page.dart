@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:auth0_flutter/auth0_flutter_web.dart';
 import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/modules/login/bloc/user_bloc.dart';
 import 'package:watchdog_dashboard/modules/login/model/user_model.dart';
@@ -15,6 +16,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool loading = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                       ElevatedButton(
                         onPressed: () async {
                           setState(() => loading = true);
-                          await UserBloc.instance.logIn(UserType.dispatcher);
+                          await UserBloc.instance.login(UserType.dispatcher);
                           setState(() => loading = false);
                         },
                         style: ElevatedButton.styleFrom(
@@ -74,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                       ElevatedButton(
                         onPressed: () async {
                           setState(() => loading = true);
-                          await UserBloc.instance.logIn(UserType.security);
+                          await UserBloc.instance.login(UserType.security);
                           setState(() => loading = false);
                         },
                         style: ElevatedButton.styleFrom(

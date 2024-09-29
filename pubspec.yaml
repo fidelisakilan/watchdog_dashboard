@@ -42,6 +42,7 @@ dependencies:
   cloud_firestore: any
   collection: ^1.18.0
   google_fonts: ^6.2.1
+  auth0_flutter: ^1.7.2
   url_launcher: any
 
 
