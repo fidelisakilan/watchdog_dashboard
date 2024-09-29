@@ -44,6 +44,7 @@ class CameraBloc {
         .collection("cam0")
         .snapshots()
         .listen((event) => _loadData(event.docs, 0));
+    await Future.delayed(const Duration(milliseconds: 100));
     _subscription2 = db
         .collection("cam1")
         .snapshots()
@@ -56,7 +57,6 @@ class CameraBloc {
 
   void _loadData(
       List<QueryDocumentSnapshot<Map<String, dynamic>>> snapshots, int index) {
-    cameraModel = CameraModel(cameras: [{}, {}], index: 0);
     for (var element in snapshots) {
       final transcript = TranscriptionModel.fromMap(element.data(), element.id);
       final date = DateFormatUtils.parseDate(transcript.timeStamp);
