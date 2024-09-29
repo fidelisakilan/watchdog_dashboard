@@ -15,8 +15,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool loading = false;
+  bool loading = true;
 
+  @override
+  void initState() {
+    super.initState();
+    UserBloc.instance.loadUser((_) {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
+    }, null);
+  }
 
   @override
   Widget build(BuildContext context) {

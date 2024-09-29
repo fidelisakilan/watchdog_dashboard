@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auth0_flutter/auth0_flutter_web.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/user_model.dart';
 
@@ -17,9 +18,13 @@ class UserBloc extends ValueNotifier<UserModel> {
     'vBAJBGhdJySCuFfjCklSzHmeM57NX6YA',
   );
 
+  static const key = 'user_type';
+
   UserType get userType => value.type;
 
-  Future<void> loadUser(Function(bool) callback) async {
+  Future<void> loadUser(Function(bool) callback, UserType? type) async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedType = UserType.values.elementAt(prefs.getInt(key) ?? 2);
     auth0.onLoad().then((final credentials) {
       if (credentials != null) {
         print('Logged IN ');
@@ -27,7 +32,7 @@ class UserBloc extends ValueNotifier<UserModel> {
         value = UserModel(
           id: '',
           token: '',
-          type: userType,
+          type: type ?? storedType,
         );
         // Logged in!
         callback(true);
@@ -36,16 +41,15 @@ class UserBloc extends ValueNotifier<UserModel> {
         callback(false);
         // Not logged in
       }
+      prefs.setInt(key, userType.index);
     });
   }
 
   Future<void> login(UserType type) async {
     final Completer<bool> completer = Completer();
-    loadUser(
-      (value) {
-        completer.complete(value);
-      },
-    );
+    loadUser((value) {
+      completer.complete(value);
+    }, type);
     final result = await completer.future;
     if (!result) _logIn(type);
   }
@@ -57,10 +61,14 @@ class UserBloc extends ValueNotifier<UserModel> {
       token: '',
       type: type,
     );
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt(key, userType.index);
   }
 
   Future<void> logOut() async {
     await auth0.logout();
     value = UserModel();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt(key, userType.index);
   }
 }
