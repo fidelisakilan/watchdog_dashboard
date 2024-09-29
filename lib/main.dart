@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           parent: AlwaysScrollableScrollPhysics(),
         ),
       ),
-      home: const HomePage(),
+      home: const LoginPage(child: HomePage()),
     );
   }
 }
