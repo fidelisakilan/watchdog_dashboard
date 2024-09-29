@@ -7,6 +7,8 @@ import 'package:watchdog_dashboard/modules/home/ui/home_page.dart';
 import 'package:watchdog_dashboard/theme.dart';
 import 'package:watchdog_dashboard/util.dart';
 
+import 'modules/login/ui/login_page.dart';
+
 void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
@@ -35,7 +37,7 @@ class MyApp extends StatelessWidget {
           parent: AlwaysScrollableScrollPhysics(),
         ),
       ),
-      home: const HomePage(),
+      home: const LoginPage(child: HomePage()),
     );
   }
 }
