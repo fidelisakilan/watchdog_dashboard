@@ -8,3 +8,15 @@ class LoadingWidget extends StatelessWidget {
     return const LinearProgressIndicator();
   }
 }
+
+class NoItemsWidget extends StatelessWidget {
+  const NoItemsWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'No Records',
+      style: context.textTheme.titleMedium,
+    );
+  }
+}

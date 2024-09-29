@@ -52,21 +52,17 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      bloc.loadData();
-    });
   }
 
   @override
   void dispose() {
-    bloc.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<CameraModel>(
-      stream: bloc.stream,
+      stream: bloc.cameraStream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Column(
@@ -84,9 +80,9 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
               itemCount: snapshot.data!.cameras[cIndex].length,
               itemBuilder: (context, index) {
                 final chats =
-                    snapshot.data!.cameras[cIndex].values.elementAt(index);
+                snapshot.data!.cameras[cIndex].values.elementAt(index);
                 final date =
-                    snapshot.data!.cameras[cIndex].keys.elementAt(index);
+                snapshot.data!.cameras[cIndex].keys.elementAt(index);
                 return MultiDynamicTimelineTile(
                   itemCount: chats.length,
                   crossSpacing: 15,
@@ -117,6 +113,7 @@ class _TimelinePromptWidgetState extends State<TimelinePromptWidget> {
                           description: chat.content,
                           videoUrl: chat.videoUrl,
                           eventTime: chat.videoOffset,
+                          flagged: chat.flagged,
                         ),
                       );
                     }).toList()
@@ -143,6 +140,7 @@ class CustomEventTile extends StatelessWidget {
   final String description;
   final String? videoUrl;
   final int? eventTime;
+  final bool flagged;
 
   const CustomEventTile({
     super.key,
@@ -150,6 +148,7 @@ class CustomEventTile extends StatelessWidget {
     required this.description,
     this.videoUrl,
     required this.eventTime,
+    required this.flagged,
   });
 
   void onTap(BuildContext context, String videoUrl, int? eventTime) {
@@ -180,7 +179,7 @@ class CustomEventTile extends StatelessWidget {
             ],
           ),
         ),
-        if (videoUrl != null)
+        if (videoUrl != null) ...[
           GestureDetector(
             onTap: () {
               onTap(context, videoUrl!, eventTime);
@@ -198,7 +197,10 @@ class CustomEventTile extends StatelessWidget {
               ),
             ),
           ),
+        ],
       ],
     );
   }
 }
+
+

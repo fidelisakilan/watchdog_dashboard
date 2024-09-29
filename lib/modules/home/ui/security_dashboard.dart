@@ -1,13 +1,13 @@
 import 'package:intl/intl.dart';
 import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/modules/home/model/camera_model.dart';
-import 'package:watchdog_dashboard/tiles/dynamic_timeline_tile_flutter.dart';
+import 'package:watchdog_dashboard/modules/home/ui/video_preview_screen.dart';
 import '../../../widgets/loading_widget.dart';
 import '../bloc/camera_bloc.dart';
 import 'timeline_widget.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class SecurityDashboard extends StatelessWidget {
+  const SecurityDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class _CameraSelectorRowWidgetState extends State<CameraSelectorRowWidget> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<CameraModel>(
-      stream: CameraBloc.instance.stream,
+      stream: CameraBloc.instance.cameraStream,
       builder: (context, snapshot) {
         return Container(
           width: 70,
@@ -98,9 +98,14 @@ class _CameraSelectorRowWidgetState extends State<CameraSelectorRowWidget> {
   }
 }
 
-class AlertWindowWidget extends StatelessWidget {
+class AlertWindowWidget extends StatefulWidget {
   const AlertWindowWidget({super.key});
 
+  @override
+  State<AlertWindowWidget> createState() => _AlertWindowWidgetState();
+}
+
+class _AlertWindowWidgetState extends State<AlertWindowWidget> {
   String parseTime(DateTime time) {
     return DateFormat.yMd().add_jm().format(time);
   }
@@ -139,17 +144,24 @@ class AlertWindowWidget extends StatelessWidget {
                       onTap: () {
                         CameraBloc.instance.changeIndex(chat.index);
                       },
-                      child: EventCard(
-                        cardRadius: BorderRadius.circular(20),
-                        cardColor: chat.chatModel.flagged
-                            ? context.colorScheme.errorContainer
-                            : context.colorScheme.surfaceContainer,
-                        child: CustomEventTile(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: context.colorScheme.surfaceDim,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.all(12),
+                        child: CustomEventTile1(
                           eventTime: chat.chatModel.videoOffset,
                           title:
                               'Camera ${chat.index + 1}: ${parseTime(chat.chatModel.timeStamp)}',
                           description: chat.chatModel.content,
                           videoUrl: chat.chatModel.videoUrl,
+                          flagged: false,
+                          onTapAlert: () {
+                            CameraBloc.instance.alertDispatcher(chat);
+                            setState(() {});
+                          },
+                          alerted: chat.dispatched,
                         ),
                       ),
                     );
@@ -160,6 +172,98 @@ class AlertWindowWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CustomEventTile1 extends StatelessWidget {
+  final String title;
+  final String description;
+  final String? videoUrl;
+  final int? eventTime;
+  final bool flagged;
+  final bool alerted;
+  final Function onTapAlert;
+
+  const CustomEventTile1({
+    super.key,
+    required this.title,
+    required this.description,
+    this.videoUrl,
+    required this.eventTime,
+    required this.flagged,
+    required this.onTapAlert,
+    required this.alerted,
+  });
+
+  void onTap(BuildContext context, String videoUrl, int? eventTime) {
+    context.push(VideoPreviewScreen(
+      url: videoUrl,
+      eventTime: eventTime,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+        Text(
+          title,
+          style: context.textTheme.labelMedium!.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          description,
+          style: context.textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 10),
+        GestureDetector(
+          onTap: () {
+            onTap(context, videoUrl!, eventTime);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: context.colorScheme.surface,
+            ),
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            alignment: Alignment.center,
+            child: Text(
+              'Watch Event',
+              style: context.textTheme.titleSmall,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        GestureDetector(
+          onTap: () {
+            if (!alerted) onTapAlert();
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: !alerted
+                  ? context.colorScheme.errorContainer
+                  : context.colorScheme.surfaceDim,
+            ),
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            alignment: Alignment.center,
+            child: Text(
+              alerted ? 'Alerted ✅︎' : 'Alert Dispatcher',
+              style: context.textTheme.titleSmall,
+
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

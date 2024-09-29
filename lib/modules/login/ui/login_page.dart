@@ -1,17 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:watchdog_dashboard/modules/home/ui/home_page.dart';
+import 'dart:io';
+
+import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/modules/login/bloc/user_bloc.dart';
 import 'package:watchdog_dashboard/modules/login/model/user_model.dart';
 
 import '../../../widgets/loading_widget.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({
-    super.key,
-    required this.child,
-  });
-
-  final Widget child;
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -21,12 +17,6 @@ class _LoginPageState extends State<LoginPage> {
   bool loading = false;
 
   @override
-  void initState() {
-    UserBloc.instance.loadUser();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (loading) {
       return const Column(
@@ -34,24 +24,77 @@ class _LoginPageState extends State<LoginPage> {
         children: [LoadingWidget()],
       );
     }
-    return ValueListenableBuilder<UserModel>(
-      valueListenable: UserBloc.instance,
-      builder: (context, value, child) {
-        final loggedIn = value.type == UserType.loggedIn;
-        if (loggedIn) return const HomePage();
-        return Center(
-          child: ElevatedButton(
-            onPressed: () async {
-              setState(() => loading = true);
-              await UserBloc.instance.logIn();
-              setState(() => loading = false);
-            },
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: context.colorScheme.secondaryContainer,
+          ),
+          Center(
             child: Text(
-              loggedIn ? "Log out" : "Log in",
+              'Watchdog Dashboard',
+              style: context.textTheme.displayMedium,
             ),
           ),
-        );
-      },
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 50),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Login as',
+                    style: context.textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          setState(() => loading = true);
+                          await UserBloc.instance.logIn(UserType.dispatcher);
+                          setState(() => loading = false);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          foregroundColor: context.colorScheme.onPrimary,
+                          backgroundColor: context.colorScheme.primary,
+                        ),
+                        child: Text(
+                          "Dispatcher",
+                          style: context.textTheme.titleSmall!
+                              .copyWith(color: context.colorScheme.onPrimary),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () async {
+                          setState(() => loading = true);
+                          await UserBloc.instance.logIn(UserType.security);
+                          setState(() => loading = false);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          foregroundColor: context.colorScheme.primary,
+                          backgroundColor: context.colorScheme.onPrimary,
+                        ),
+                        child: Text(
+                          "Security",
+                          style: context.textTheme.titleSmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -2,11 +2,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:watchdog_dashboard/config.dart';
 import 'package:watchdog_dashboard/firebase_options.dart';
-import 'package:watchdog_dashboard/modules/home/ui/home_page.dart';
+import 'package:watchdog_dashboard/modules/home/ui/security_dashboard.dart';
+import 'package:watchdog_dashboard/modules/login/bloc/user_bloc.dart';
+import 'package:watchdog_dashboard/modules/login/ui/login_page.dart';
 import 'package:watchdog_dashboard/theme.dart';
 import 'package:watchdog_dashboard/util.dart';
 
-import 'modules/login/ui/login_page.dart';
+import 'modules/home/ui/dispatcher_dashboard.dart';
+import 'modules/login/model/user_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +17,14 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme =
@@ -24,7 +32,7 @@ class MyApp extends StatelessWidget {
 
     MaterialTheme theme = MaterialTheme(textTheme);
     return MaterialApp(
-      title: 'WatchDog Dashboard',
+      title: 'WatchDog',
       debugShowCheckedModeBanner: false,
       theme: theme.light().copyWith(
             appBarTheme: const AppBarTheme(
@@ -37,7 +45,28 @@ class MyApp extends StatelessWidget {
           parent: AlwaysScrollableScrollPhysics(),
         ),
       ),
-      home: const LoginPage(child: HomePage()),
+      home: const HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: UserBloc.instance,
+      builder: (context, value, child) {
+        switch (value.type) {
+          case UserType.guest:
+            return const LoginPage();
+          case UserType.dispatcher:
+            return const DispatcherDashboard();
+          case UserType.security:
+            return const SecurityDashboard();
+        }
+      },
     );
   }
 }

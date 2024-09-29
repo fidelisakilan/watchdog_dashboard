@@ -1,4 +1,4 @@
-enum UserType { guest, loggedIn }
+enum UserType { guest, dispatcher, security }
 
 class UserModel {
   final String? id;
