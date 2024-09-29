@@ -5,7 +5,6 @@ import 'package:watchdog_dashboard/modules/home/ui/video_preview_screen.dart';
 import 'package:watchdog_dashboard/tiles/dynamic_timeline_tile_flutter.dart';
 import 'package:watchdog_dashboard/widgets/loading_widget.dart';
 import '../../../widgets/divider.dart';
-import '../../login/bloc/user_bloc.dart';
 import '../model/camera_model.dart';
 import '../utils.dart';
 
@@ -22,7 +21,8 @@ class TimelineWidget extends StatelessWidget {
           actions: [
             IconButton(
               onPressed: () {
-                UserBloc.instance.logOut();
+                //TODO:
+                // UserBloc.instance.logOut();
               },
               icon: Icon(
                 Icons.logout,

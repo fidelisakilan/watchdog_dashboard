@@ -1,6 +1,6 @@
 {
-    "name": "watchdog_dashboard",
-    "short_name": "watchdog_dashboard",
+    "name": "Watchdog",
+    "short_name": "Watchdog",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
